@@ -16,7 +16,7 @@ var (
 func main() {
 	nombre = "Emilio Andere Lopez"
 	AbrirConexion()
-	data := ShowQuery("membresia", nombre)
+	data := ShowQuery("Membresia", nombre)
 	if data != "0" {
 		fmt.Println(data)
 	} else {
@@ -30,10 +30,9 @@ func main() {
 }
 
 func AbrirConexion() {
-	db, err = sql.Open("mysql", string("root:@tcp(127.0.0.1:3306)/test_pract01"))
+	db, err = sql.Open("mysql", string("bienhechor:Bienhechor_1234;@tcp(74.208.31.248:3306)/bienhechor"))
 	if err != nil {
 		panic(err)
-
 	}
 	err = db.Ping()
 	if err != nil {
@@ -44,7 +43,7 @@ func AbrirConexion() {
 
 func ShowQuery(tabla string, where string) string {
 	var id, tipo string
-	query := db.QueryRow("SELECT * FROM "+tabla+" WHERE tipo_membresia = ? ", where)
+	query := db.QueryRow("SELECT * FROM "+tabla+" WHERE TipoMembresia = ? ", where)
 	err = query.Scan(&id, &tipo)
 	if err != nil {
 		return "0"
@@ -53,7 +52,7 @@ func ShowQuery(tabla string, where string) string {
 }
 
 func InsertQuery(Name string) (bool, string) {
-	add, err := db.Exec("Insert into membresia (id_membresia, tipo_membresia) values (NULL, ?)", Name)
+	add, err := db.Exec("Insert into Membresia (IdMembresia, TipoMembresia) values (NULL, ?)", Name)
 	if err != nil {
 		return false, "0"
 	}
