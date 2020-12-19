@@ -31,7 +31,7 @@ func main() {
 
 func openConn() {
 	//bienhechor:Bienhechor_1234;@tcp(74.208.31.248:3306)/bienhechor
-	db, err = sql.Open("mysql", string("root:@tcp(127.0.0.1:3306)/test_membresias"))
+	db, err = sql.Open("mysql", string("bienhechor:Bienhechor_1234;@tcp(74.208.31.248:3306)/bienhechor"))
 	reviewError(err)
 	err = db.Ping()
 	reviewError(err)
