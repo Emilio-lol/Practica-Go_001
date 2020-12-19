@@ -3,7 +3,6 @@ package main
 import (
 	"database/sql"
 	"fmt"
-	"strconv"
 
 	_ "github.com/go-sql-driver/mysql"
 )
@@ -62,5 +61,5 @@ func InsertQuery(Name string) (bool, string) {
 	if err != nil {
 		return false, "0"
 	}
-	return true, strconv.Itoa(int(query))
+	return true, string(query)
 }
