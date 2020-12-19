@@ -8,57 +8,72 @@ import (
 )
 
 var (
-	err    error
-	db     *sql.DB
-	nombre string
+	err  error
+	db   *sql.DB
+	name = "Emilio Andere Lopez"
 )
 
+type Membresia struct {
+	Id   string
+	Tipo string
+}
+
 func main() {
-	nombre = "Emilio Andere Lopez"
-	AbrirConexion()
-	data := ShowQuery("Membresia", nombre)
-	if data != "0" {
-		fmt.Println(data)
+	openConn()
+	registros := existMembresia(name)
+	if registros != "0" {
+		fmt.Println(registros)
 	} else {
-		dato, id := InsertQuery(nombre)
-		if dato {
-			fmt.Println("Insertado con exito\n" + nombre + ". ID: " + id)
-		} else {
-			fmt.Println("A ocurrido un error")
+		data := insertMembresia(name)
+		fmt.Println("Ha sido insertado:", data)
+	}
+}
+
+func openConn() {
+	//bienhechor:Bienhechor_1234;@tcp(74.208.31.248:3306)/bienhechor
+	db, err = sql.Open("mysql", string("root:@tcp(127.0.0.1:3306)/test_membresias"))
+	reviewError(err)
+	err = db.Ping()
+	reviewError(err)
+}
+
+func reviewError(err error) {
+	if err != nil {
+		panic(err)
+	}
+}
+
+func existMembresia(name string) (status string) {
+	var registros []Membresia
+	mostrar, err := db.Query("SELECT * FROM Membresia")
+	reviewError(err)
+
+	for mostrar.Next() {
+		var id, nombre string
+		err = mostrar.Scan(&id, &nombre)
+		reviewError(err)
+
+		registros = append(registros, Membresia{id, nombre})
+	}
+
+	for i := 0; i < len(registros); i++ {
+		if registros[i].Tipo == name {
+			status = registros[i].Tipo + ". ID: " + registros[i].Id
+			return
 		}
 	}
+	status = "0"
+	return
 }
 
-func AbrirConexion() {
-	db, err = sql.Open("mysql", string("bienhechor:Bienhechor_1234;@tcp(74.208.31.248:3306)/bienhechor"))
+func insertMembresia(name string) bool {
+	add, err := db.Exec("Insert into Membresia (IdMembresia, TipoMembresia) values (NULL, ?)", name)
 	if err != nil {
-		panic(err)
+		return false
 	}
-	err = db.Ping()
+	_, err = add.LastInsertId()
 	if err != nil {
-		panic(err)
-
+		return false
 	}
-}
-
-func ShowQuery(tabla string, where string) string {
-	var id, tipo string
-	query := db.QueryRow("SELECT * FROM "+tabla+" WHERE TipoMembresia = ? ", where)
-	err = query.Scan(&id, &tipo)
-	if err != nil {
-		return "0"
-	}
-	return tipo + ". ID: " + id
-}
-
-func InsertQuery(Name string) (bool, string) {
-	add, err := db.Exec("Insert into Membresia (IdMembresia, TipoMembresia) values (NULL, ?)", Name)
-	if err != nil {
-		return false, "0"
-	}
-	query, err := add.LastInsertId()
-	if err != nil {
-		return false, "0"
-	}
-	return true, string(query)
+	return true
 }
